@@ -1,0 +1,96 @@
+# ============================================================
+# GNN-BERT Music Context — Central Configuration
+# ============================================================
+
+# --- Paths ---
+paths:
+  fma_raw: "data/raw/fma"
+  fma_audio: "data/raw/fma/fma_medium"
+  fma_metadata: "data/raw/fma/fma_metadata"
+  deam_raw: "data/raw/deam"
+  deam_audio: "data/raw/deam/MEMD_audio"
+  deam_annotations: "data/raw/deam/annotations/annotations averaged per song/song_level"
+  processed_fma: "data/processed/fma"
+  processed_deam: "data/processed/deam"
+  splits: "data/splits"
+  results: "results"
+  checkpoints: "results/checkpoints"
+  plots: "plots"
+  report: "report"
+
+# --- Audio Feature Extraction ---
+audio:
+  sample_rate: 22050
+  n_mels: 128
+  n_chroma: 12
+  hop_length: 512
+  n_fft: 2048
+  # FMA medium clips are 30s; DEAM clips are ~45s
+  # We don't truncate — graphs handle variable length via segmentation
+
+# --- Graph Construction ---
+graph:
+  num_segments: 10          # Number of temporal segments per track
+  cosine_threshold: 0.8     # tau: connect nodes with cos_sim > tau
+  node_feature_dim: 140     # 128 mel + 12 chroma
+
+# --- Training: Task 1 (BERT Genre Classifier) ---
+task1_bert:
+  model_name: "bert-base-uncased"
+  freeze_bert: false
+  num_classes: 16           # FMA top-level genres
+  learning_rate: 2.0e-5
+  weight_decay: 0.01
+  batch_size: 32
+  num_epochs: 5
+  max_seq_length: 128       # Genre text descriptions are short
+
+# --- Training: Task 2 (GraphSAGE Genre Classifier) ---
+task2_gnn:
+  in_channels: 140          # 128 mel + 12 chroma
+  hidden_channels: 128
+  num_layers: 3
+  num_classes: 16
+  learning_rate: 1.0e-3
+  weight_decay: 5.0e-4
+  batch_size: 64
+  num_epochs: 30
+  dropout: 0.3
+
+# --- Training: Task 3 (Cross-Attention Fusion) ---
+task3_fusion:
+  gnn_hidden_dim: 128
+  bert_hidden_dim: 768
+  d_k: 64
+  num_tags: 16
+  learning_rate: 1.0e-4
+  weight_decay: 1.0e-4
+  batch_size: 32
+  num_epochs: 20
+  alpha: 1.0                # Valence loss weight
+  beta: 1.0                 # Arousal loss weight
+
+# --- Training: Task 4 (InfoNCE Contrastive) ---
+task4_contrastive:
+  tau: 0.07                 # Temperature for InfoNCE
+  projection_dim: 256       # Shared embedding space dimension
+  learning_rate: 1.0e-4
+  weight_decay: 1.0e-4
+  batch_size: 64
+  num_epochs: 30
+
+# --- Baselines ---
+baselines:
+  cnn:
+    num_classes: 16
+    learning_rate: 1.0e-3
+    batch_size: 64
+    num_epochs: 20
+
+# --- Evaluation ---
+eval:
+  classification_threshold: 0.5
+  tsne_perplexity: 30
+  tsne_n_iter: 1000
+  num_case_studies: 3
+  num_retrieval_examples: 10
