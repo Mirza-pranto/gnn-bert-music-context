@@ -1,54 +1,51 @@
 GNN-Based BERT for Understanding Context from Music
 This repository contains the implementation, models, and deliverables for a multi-modal framework that integrates a Graph Neural Network (GraphSAGE) and a Bidirectional Encoder Representation from Transformers (BERT) for context-aware music representation learning. This project overcomes the limitations of conventional acoustic-only sequence learning by bridging the gap between structural audio graphs and semantic text embeddings.   
-PDF
-+ 1
+
+
 
 System Architecture
 The framework represents musical events as a topological structure of sound events and connects them with natural language descriptions, broken down into four primary modeling tasks:   
-PDF
+
 
 Task 1: Text Encoder: Uses a 109M parameter bert-base-uncased transformer to encode text for semantic understanding, mapping captions and tags to 16 FMA genres. The token sequences are padded or truncated to a maximum length of 128 tokens.   
-PDF
-+ 1
+
 
 Task 2: Graph Encoder: Implements a 3-layer GraphSAGE structure on temporal segment graphs to combine acoustic features from both sequential and non-sequential segments (like repeating motifs) using message passing and a global mean-pooling readout layer.   
-PDF
+
 
 Task 3: Cross-Attention Fusion: Adopts a bilateral multi-head attention mechanism to fuse the structural GNN embeddings with the semantic BERT embeddings, optimizing the network using a multi-task loss function.   
-PDF
+
 
 Task 4: Contrastive Cross-Modal Alignment: Utilizes a contrastive InfoNCE loss on pairs of graph and text embeddings to project both modalities into a shared 256-dimensional space.   
-PDF
+
 
 Datasets and Preprocessing
 This pipeline leverages three powerful datasets to train and align the multi-modal network:   
-PDF
+
 
 FMA-medium: Used as the source for raw audio clips, providing 16 genre labels and top tags. Tracks are partitioned into 10 temporal regions per track mapped to a graph.   
-PDF
-+ 1
+
 
 DEAM: Provides continuous valence and arousal labels used as auxiliary targets for multi-task fusion.   
-PDF
+
 
 MusicCaps: Provides expert-curated natural language captions used for contrastive retrieval alignment.   
-PDF
+
 
 Audio Preprocessing:
 
 All audio is uniformly resampled to 22,050 Hz using the librosa library, followed by the computation of log-mel spectrograms.   
-PDF
+
 
 The generated graphs utilize 140-dimensional node feature vectors, consisting of 128 Mel-spectrogram bands and 12 Chroma features.   
-PDF
+
 
 Graph topology is constructed using temporal adjacency edges and cosine similarity edges (threshold set to 0.75).   
-PDF
+
 
 Empirical Evaluation
 The architecture was evaluated on multi-label tagging, emotion regression, and cross-modal alignment. The Cross-Attention Fusion model significantly outperformed isolated acoustic modeling baselines (such as 2D-CNNs and standalone GraphSAGE).   
-PDF
-+ 1
+
 
 Benchmark Results:
 
@@ -67,16 +64,12 @@ The repository includes the fully implemented model components, basic baselines,
 PDF
 
 results/checkpoints/: Contains the fine-tuned PyTorch model checkpoints.   
-PDF
-
 results/metrics.json: Contains the raw records of the evaluation metrics.   
-PDF
-
 graph_samples/: Contains isolated graph samples visualizing the topological structures.   
-PDF
+
 
 Latex report..pdf: The comprehensive project document detailing the research, mathematical foundations, and qualitative case studies (including t-SNE visualizations of the learned latent space).   
-PDF
+
 
 Author
 Mirza Julkawsar Pranto
